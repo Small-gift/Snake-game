@@ -1,169 +1,29 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>贪吃蛇</title>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: #2c3e50;
-            color: white;
-            margin: 0;
-            touch-action: none;
-        }
-
-        #gameCanvas {
-            border: 2px solid #ecf0f1;
-            margin: 20px 0;
-        }
-
-        #score {
-            font-size: 24px;
-            margin: 10px;
-        }
-
-        .controls {
-            display: none;
-            grid-template-areas: 
-                ". up ."
-                "left down right";
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .control-btn {
-            width: 60px;
-            height: 60px;
-            border: none;
-            border-radius: 50%;
-            background: #3498db;
-            color: white;
-            font-size: 24px;
-            touch-action: none;
-        }
-
-        @media (max-width: 768px) {
-            .controls {
-                display: grid;
-            }
-        }
-    </style>
+    <title>Snake Game</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
 </head>
 <body>
-    <div id="score">得分: 0</div>
-    <canvas id="gameCanvas"></canvas>
-    <div class="controls">
-        <button class="control-btn" id="up" style="grid-area: up">↑</button>
-        <button class="control-btn" id="left" style="grid-area: left">←</button>
-        <button class="control-btn" id="down" style="grid-area: down">↓</button>
-        <button class="control-btn" id="right" style="grid-area: right">→</button>
+    <div class="container noselect">
+            <div id="author">
+                <h1>Snake Game</h1>
+            </div>
+        <div id="canvas"></div>
+            <div id="ui">
+                <h2>SCORE</h2>
+                <br>
+                <span id="score">00</span>
+            </div>
+        <button id="replay">
+            <i class="fas fa-play"></i>
+            RESTART
+        </button>
+        </div>
     </div>
-
-    <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        const scoreElement = document.getElementById('score');
-        
-        // 根据设备调整画布大小
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-        canvas.width = isMobile ? 300 : 400;
-        canvas.height = isMobile ? 300 : 400;
-        
-        const gridSize = 20;
-        const tileCount = canvas.width / gridSize;
-        
-        let snake = [{x: 10, y: 10}];
-        let food = {x: 15, y: 15};
-        let dx = 0;
-        let dy = 0;
-        let score = 0;
-        let gameLoop;
-        
-        // 控制方向
-        function changeDirection(newDx, newDy) {
-            if (dx !== -newDx || dy !== -newDy) {
-                dx = newDx;
-                dy = newDy;
-            }
-        }
-
-        // 手机控制按钮
-        document.querySelectorAll('.control-btn').forEach(btn => {
-            btn.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                switch(btn.id) {
-                    case 'up': changeDirection(0, -1); break;
-                    case 'down': changeDirection(0, 1); break;
-                    case 'left': changeDirection(-1, 0); break;
-                    case 'right': changeDirection(1, 0); break;
-                }
-            });
-        });
-
-        // 键盘控制
-        document.addEventListener('keydown', (e) => {
-            switch(e.key) {
-                case 'ArrowUp': changeDirection(0, -1); break;
-                case 'ArrowDown': changeDirection(0, 1); break;
-                case 'ArrowLeft': changeDirection(-1, 0); break;
-                case 'ArrowRight': changeDirection(1, 0); break;
-            }
-        });
-
-        function generateFood() {
-            food.x = Math.floor(Math.random() * tileCount);
-            food.y = Math.floor(Math.random() * tileCount);
-            // 确保食物不在蛇身上
-            if (snake.some(segment => segment.x === food.x && segment.y === food.y)) {
-                generateFood();
-            }
-        }
-
-        function gameOver() {
-            clearInterval(gameLoop);
-            alert(`游戏结束！得分: ${score}`);
-            resetGame();
-        }
-
-        function resetGame() {
-            snake = [{x: 10, y: 10}];
-            dx = 0;
-            dy = 0;
-            score = 0;
-            scoreElement.textContent = `得分: ${score}`;
-            generateFood();
-            gameLoop = setInterval(update, 100);
-        }
-
-        function update() {
-            // 移动蛇头
-            const head = {x: snake[0].x + dx, y: snake[0].y + dy};
-            
-            // 碰撞检测
-            if (head.x < 0 || head.x >= tileCount || 
-                head.y < 0 || head.y >= tileCount ||
-                snake.some(segment => segment.x === head.x && segment.y === head.y)) {
-                gameOver();
-                return;
-            }
-
-            snake.unshift(head);
-            
-            // 吃食物检测
-            if (head.x === food.x && head.y === food.y) {
-                score += 10;
-                scoreElement.textContent = `得分: ${score}`;
-                generateFood();
-            } else {
-                snake.pop();
-            }
-
-            draw();
-        }
-
-        function draw() {
-            // 清空画布
-            ctx.fillStyle = '#2c3e
+</body>
+</html>
